@@ -9,7 +9,7 @@ resource "aws_launch_template" "example_launch_template" {
   vpc_security_group_ids = [aws_security_group.instance.id]
 
   user_data = base64encode(templatefile("user-data.sh", {
-    server_port: var.server_port
+    server_port : var.server_port
   }))
 
   lifecycle {
