@@ -11,7 +11,7 @@ provider "aws" {
   region = "us-east-2"
 }
 module "database_instance" {
-  source = "../../../modules/data-stores/mysql"
+  source = "../../../../modules/data-stores/mysql"
 
   instance_class = "db.t3.micro"
   db_name = "prod_database"
