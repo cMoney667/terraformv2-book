@@ -21,4 +21,9 @@ module "webserver_cluster" {
   enable_autoscaling = true
   db_remote_state_bucket = "cmoney-terraform-up-and-running-state"
   db_remote_state_key = "prod/data-stores/mysql/terraform.tfstate"
+
+  custom_tags = {
+    Owner = "team-foo"
+    ManagedBy = "terraform"
+  }
 }

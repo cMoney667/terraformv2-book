@@ -1,11 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "5.81.0"
-    }
-  }
-}
 resource "aws_launch_template" "example_launch_template" {
   name_prefix            = "${var.cluster_name}-launch-template"
   image_id               = "ami-0fb653ca2d3203ac1"
@@ -52,6 +44,15 @@ resource "aws_autoscaling_group" "example_autoscaling_group" {
     key                 = "Name"
     value               = "${var.cluster_name}-asg"
     propagate_at_launch = true
+  }
+
+  dynamic "tag" {
+    for_each = var.custom_tags
+    content {
+      key = tag.key
+      value = tag.value
+      propagate_at_launch = true
+    }
   }
 }
 
