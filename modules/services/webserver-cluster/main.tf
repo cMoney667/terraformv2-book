@@ -56,7 +56,7 @@ resource "aws_autoscaling_group" "example_autoscaling_group" {
   }
 }
 
-resource "aws_autoscaling_schedule" "scaling_out_during_business_hours" {
+resource "aws_autoscaling_schedule" "scale_out_during_business_hours" {
   count = var.enable_autoscaling ? 1 : 0
 
   scheduled_action_name = "scale-out-during-business-hours"
