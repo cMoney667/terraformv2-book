@@ -7,6 +7,7 @@ module "users" {
 
   for_each = toset(var.user_names)
   user_name = each.value
+  # give_neo_cloudwatch_full_access = false
 }
 
 variable "hero_thousand_faces" {
@@ -29,4 +30,11 @@ output "short_upper_names" {
 }
 output "for_directive" {
   value = "%{ for i, name in var.user_names }(${i}) ${name}, %{ endfor }"
+}
+output "for_directive_index_if_else_strip" {
+  value = <<EOF
+  %{~ for i, name in var.user_names ~}
+  ${name}%{if i < length(var.user_names) - 1}, %{ else }.%{ endif }
+  %{~ endfor ~}
+  EOF
 }

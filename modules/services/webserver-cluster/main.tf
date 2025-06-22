@@ -6,8 +6,8 @@ resource "aws_launch_template" "example_launch_template" {
 
   user_data = base64encode(templatefile("${path.module}/user-data.sh", {
     server_port : var.server_port,
-    db_address: data.terraform_remote_state.db.outputs.address,
-    db_port: data.terraform_remote_state.db.outputs.port
+    db_address : data.terraform_remote_state.db.outputs.address,
+    db_port : data.terraform_remote_state.db.outputs.port
   }))
 
   lifecycle {
@@ -47,10 +47,14 @@ resource "aws_autoscaling_group" "example_autoscaling_group" {
   }
 
   dynamic "tag" {
-    for_each = var.custom_tags
+    for_each = {
+      for key, value in var.custom_tags :
+      key => upper(value)
+      if key != "Name"
+    }
     content {
-      key = tag.key
-      value = tag.value
+      key                 = tag.key
+      value               = tag.value
       propagate_at_launch = true
     }
   }
@@ -60,10 +64,10 @@ resource "aws_autoscaling_schedule" "scale_out_during_business_hours" {
   count = var.enable_autoscaling ? 1 : 0
 
   scheduled_action_name = "scale-out-during-business-hours"
-  min_size = 2
-  max_size = 10
-  desired_capacity = 10
-  recurrence = "0 9 * * *"
+  min_size              = 2
+  max_size              = 10
+  desired_capacity      = 10
+  recurrence            = "0 9 * * *"
 
   autoscaling_group_name = aws_autoscaling_group.example_autoscaling_group.name
 }
@@ -71,10 +75,10 @@ resource "aws_autoscaling_schedule" "scale_in_at_night" {
   count = var.enable_autoscaling ? 1 : 0
 
   scheduled_action_name = "scale-in-at-night"
-  min_size = 2
-  max_size = 10
-  desired_capacity = 2
-  recurrence = "0 17 * * *"
+  min_size              = 2
+  max_size              = 10
+  desired_capacity      = 2
+  recurrence            = "0 17 * * *"
 
   autoscaling_group_name = aws_autoscaling_group.example_autoscaling_group.name
 }
@@ -139,22 +143,22 @@ resource "aws_security_group" "alb" {
   name = "${var.cluster_name}-lb"
 }
 resource "aws_security_group_rule" "allow_http_inbound" {
-  type = "ingress"
+  type              = "ingress"
   security_group_id = aws_security_group.alb.id
 
-  from_port = local.http_port
-  to_port = local.http_port
-  protocol = local.tcp_protocol
+  from_port   = local.http_port
+  to_port     = local.http_port
+  protocol    = local.tcp_protocol
   cidr_blocks = local.all_ips
 }
 
 resource "aws_security_group_rule" "allow_all_outbound" {
-  type = "egress"
+  type              = "egress"
   security_group_id = aws_security_group.alb.id
 
-  from_port = local.http_port
-  to_port = local.http_port
-  protocol = local.any_protocol
+  from_port   = local.http_port
+  to_port     = local.http_port
+  protocol    = local.any_protocol
   cidr_blocks = local.all_ips
 }
 
@@ -174,15 +178,15 @@ data "terraform_remote_state" "db" {
 
   config = {
     bucket = var.db_remote_state_bucket
-    key = var.db_remote_state_key
+    key    = var.db_remote_state_key
     region = "us-east-2"
   }
 }
 
 locals {
-  http_port = 80
-  any_port = 0
+  http_port    = 80
+  any_port     = 0
   any_protocol = "-1"
   tcp_protocol = "tcp"
-  all_ips = ["0.0.0.0/0"]
+  all_ips      = ["0.0.0.0/0"]
 }
